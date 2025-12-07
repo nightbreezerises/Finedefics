@@ -3,6 +3,30 @@ import os
 from collections import defaultdict
 from pathlib import Path
 
+
+def load_from_split_json(root, split="test"):
+    """
+    通用函数：从 split_datasets_images.json 读取数据集划分
+    返回 label2paths 字典，如果文件不存在则返回 None
+    """
+    _base_folder = Path(root)
+    _split_file = _base_folder / "images_split" / "split_datasets_images.json"
+    
+    if not _split_file.exists():
+        return None
+    
+    label2paths = defaultdict(list)
+    with open(_split_file) as f:
+        split_data = json.loads(f.read())
+    
+    data = split_data.get(split, [])
+    for item in data:
+        label = item[0].replace("_", " ")
+        image_path = item[2]  # 直接使用 json 中的路径
+        label2paths[label].append(image_path)
+    
+    return label2paths
+
 # IMPORTANT: we renamed the first "sunglasses" to "sunglass" and the second "missile" to "projectile" since the dict needs unique labels.
 imagenet_classes_mapping = {"0": ["n01440764", "tench"], "1": ["n01443537", "goldfish"],
                             "2": ["n01484850", "great_white_shark"], "3": ["n01491361", "tiger_shark"],
@@ -733,9 +757,14 @@ def load_imagenet6k(root, lex, max_examples=10):
 
 #adapted from torchvision.datasets.Food101
 def load_food101(root):
-    _base_folder = Path(root) # / "food-101"
+    # 优先从 split_datasets_images.json 读取
+    result = load_from_split_json(root)
+    if result is not None:
+        return result
+    
+    # 回退到原始方式
+    _base_folder = Path(root)
     _meta_folder = _base_folder / "meta"
-    _images_folder = _base_folder / "images"
 
     split = "test"
 
@@ -745,16 +774,18 @@ def load_food101(root):
 
     for class_label, im_rel_paths in metadata.items():
         label = class_label.replace("_", " ")
-
-        image_files = [
-            f"images/{im_rel_path}.jpg" for im_rel_path in im_rel_paths
-        ]
+        image_files = [f"images/{im_rel_path}.jpg" for im_rel_path in im_rel_paths]
         label2paths[label].extend(image_files)
     return label2paths
 
 
 #adapted from torchvision.datasets.Flowers102
 def load_flowers102(root):
+    # 优先从 split_datasets_images.json 读取
+    result = load_from_split_json(root)
+    if result is not None:
+        return result
+    
     classes = [
         'pink primrose',
         'hard-leaved pocket orchid',
@@ -886,6 +917,11 @@ def load_flowers102(root):
 
 #Adapted from torchvision.datasets.FGVCAircraft
 def load_fgvc_aircraft(root):
+    # 优先从 split_datasets_images.json 读取
+    result = load_from_split_json(root)
+    if result is not None:
+        return result
+    
     _split = "test" #verify_str_arg(split, "split", ("train", "val", "trainval", "test"))
     _annotation_level = "variant"
     #     verify_str_arg(
@@ -924,6 +960,11 @@ def load_fgvc_aircraft(root):
 
 
 def load_stanford_cars(root):
+    # 优先从 split_datasets_images.json 读取
+    result = load_from_split_json(root)
+    if result is not None:
+        return result
+    
     _split = "test" #verify_str_arg(split, "split", ("train", "test"))
     _base_folder = Path(root) #/ "stanford_cars"
     devkit = _base_folder / "devkit"
@@ -960,6 +1001,11 @@ def load_stanford_cars(root):
 
 #Adapted from torchvision.datasets.OxfordIIIPet
 def load_oxford_pet(root):
+    # 优先从 split_datasets_images.json 读取
+    result = load_from_split_json(root)
+    if result is not None:
+        return result
+    
     _split = "test" #verify_str_arg(split, "split", ("trainval", "test"))
 
     _base_folder = Path(root)  #/ "oxford-iiit-pet"
@@ -1003,6 +1049,11 @@ def load_geode(root):
     return label2paths
 
 def load_dogs_120(root):
+    # 优先从 split_datasets_images.json 读取
+    result = load_from_split_json(root)
+    if result is not None:
+        return result
+    
     _split = "test"
     _base_folder = Path(root)
 
@@ -1026,6 +1077,11 @@ def load_dogs_120(root):
     return label2paths
 
 def load_bird_200(root):
+    # 优先从 split_datasets_images.json 读取
+    result = load_from_split_json(root)
+    if result is not None:
+        return result
+    
     _split = "test"
     _base_folder = Path(root)
     _image_folder = _base_folder / "images"

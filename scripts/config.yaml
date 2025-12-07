@@ -1,0 +1,97 @@
+# Finedefics Pipeline Configuration
+# ================================
+
+# 环境配置
+environment:
+  conda_path: /home/hdl/miniconda3  # conda 安装路径
+  conda_env: finedefics             # conda 环境名称
+
+# 路径配置 (支持相对路径，相对于项目根目录)
+paths:
+  data_dir: ./datasets              # 数据集目录
+  log_dir: ./logs                   # 日志目录
+  results_dir: ./results            # 结果保存目录
+  finedefics_dir: ./models/Finedefics  # Finedefics 模型目录
+
+# GPU 配置
+gpu: 1  # 使用的 GPU 编号，多卡用逗号分隔如 "0,1"
+
+# 数据集名称
+# --------------------------------
+# 细粒度分类: dog, bird, flower, car, pet, aircraft, food, birdsnap
+# 通用分类:   caltech101, caltech256, dtd, eurosat, ucf, sun397, imagenet_1k, imagenet_a, imagenet_r, imagenet_sketch, imagenet_v2
+# --------------------------------
+dataset: dog
+
+# 训练参数（暂不实现）
+train:
+  train_ratio: 10.0  # 调试使用: 从训练集抽百分之多少做优化 (1-100)
+
+# 分类评估参数
+classification:
+  test_ratio: 100.0      # 从测试集抽百分之多少做分类 (1-100)，100表示全部
+  batch_size: 4          # 推理批次大小，根据显存调整
+  max_examples: 9999     # 每类最大样本数，9999表示不限制
+  task: mc               # 任务类型: mc (多选题) 或 yn (是否题)
+  choice_enumeration: ABCD  # 选项枚举方式
+  load_quantized: false  # 是否量化加载: false, 4bit, 8bit
+
+# 提示词配置 (根据数据集自动选择)
+prompts:
+  dog: "Which of these dogs is shown in the image?"
+  bird: "Which of these birds is shown in the image?"
+  flower: "Which of these flowers is shown in the image?"
+  car: "Which of these cars is shown in the image?"
+  pet: "Which of these pets is shown in the image?"
+  aircraft: "Which of these aircrafts is shown in the image?"
+  food: "Which of these foods is shown in the image?"
+  birdsnap: "Which of these birds is shown in the image?"
+  caltech101: "Which of these objects is shown in the image?"
+  caltech256: "Which of these objects is shown in the image?"
+  dtd: "Which of these textures is shown in the image?"
+  eurosat: "Which of these satellite images is shown in the image?"
+  ucf: "Which of these actions is shown in the image?"
+  sun397: "Which of these scenes is shown in the image?"
+  imagenet_1k: "Which of these objects is shown in the image?"
+  imagenet_a: "Which of these objects is shown in the image?"
+  imagenet_r: "Which of these objects is shown in the image?"
+  imagenet_sketch: "Which of these objects is shown in the image?"
+  imagenet_v2: "Which of these objects is shown in the image?"
+
+# 数据集目录映射 (config数据集名 -> 本地目录名)
+dataset_dirs:
+  dog: dogs_120
+  bird: CUB_200_2011
+  flower: flowers_102
+  car: car_196
+  pet: pet_37
+  aircraft: fgvc_aircraft
+  food: food_101
+  birdsnap: birdsnap
+  caltech101: caltech101
+  caltech256: caltech256
+  dtd: dtd
+  eurosat: eurosat
+  ucf: ucf101
+  sun397: SUN397
+  imagenet_1k: ImageNet_1k
+  imagenet_a: ImageNet_A
+  imagenet_r: ImageNet_R
+  imagenet_sketch: ImageNet_Sketch
+  imagenet_v2: ImageNet_v2
+
+# FOCI-Benchmark 数据集名映射 (config数据集名 -> FOCI-Benchmark数据集名)
+# 用于调用 run_ic_bench.py
+foci_dataset_names:
+  dog: dog-120
+  bird: bird-200
+  flower: flower-102
+  car: car-196
+  pet: pet-37
+  aircraft: aircraft-102
+  food: food101
+
+# 实验编号（用于区分不同实验）
+experiment:
+  id: 1                  # 实验编号，不同编号的结果保存在不同目录
+  name: ""               # 实验名称（可选），用于日志标识
